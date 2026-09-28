@@ -6,8 +6,8 @@ WORKDIR /app
 # Copy dependency files
 COPY package*.json ./
 
-# Install npm dependencies
-RUN npm ci --only=production || npm install --production
+# Install npm dependencies & install matching chromium browser
+RUN npm install --production && npx playwright install chromium
 
 # Copy all application files
 COPY . .
