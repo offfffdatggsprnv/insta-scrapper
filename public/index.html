@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InstaExtract — Instagram Carousel Text & OCR Extractor</title>
+  <meta name="description" content="Extract all text from any Instagram carousel post automatically. High-precision OCR, multi-slide viewer, markdown export, and AI formatting.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">Insta<span class="gradient-text">Extract</span></span>
+          <span class="brand-badge">Carousel OCR Studio</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="header-session-btn" class="header-session-btn not-connected" title="Manage Instagram Login Session">
+          <span class="session-dot"></span>
+          <span id="session-status-text">Guest Mode (18+ posts locked)</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content">
+    <!-- Hero Header -->
+    <section class="hero-section">
+      <h1 class="hero-title">Extract Text from Any <span class="gradient-text">Instagram Carousel</span></h1>
+      <p class="hero-subtitle">
+        Paste the link of any carousel post. Our automated browser engine navigates every slide, extracts crystal-clear image snapshots, and runs OCR to transcribe all text seamlessly.
+      </p>
+    </section>
+
+    <!-- Extraction Card -->
+    <section class="card input-card">
+      <div class="tabs-nav">
+        <button id="tab-url" class="tab-btn active" data-tab="url">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+          Instagram Link
+        </button>
+        <button id="tab-upload" class="tab-btn" data-tab="upload">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          Direct Image Upload / Fallback
+        </button>
+      </div>
+
+      <!-- Tab 1: URL Form -->
+      <div id="content-url" class="tab-content active">
+        <div class="input-group">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+          </div>
+          <input 
+            type="url" 
+            id="instagram-url-input" 
+            placeholder="https://www.instagram.com/p/BodHtjQFTJE/..." 
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <button id="btn-paste" class="btn-secondary btn-icon" title="Paste from clipboard">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+            </svg>
+            Paste
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab 2: Upload Form -->
+      <div id="content-upload" class="tab-content">
+        <div id="drop-zone" class="drop-zone">
+          <input type="file" id="file-input" multiple accept="image/*" style="display:none;">
+          <div class="drop-icon">
+            <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.8" fill="none">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+          </div>
+          <p class="drop-title">Drag & drop carousel slides here or <span class="highlight">browse</span></p>
+          <p class="drop-hint">Supports PNG, JPG, WEBP &bull; Paste directly with Ctrl+V &bull; Up to 20 slides</p>
+          <div id="upload-preview-container" class="upload-preview-container"></div>
+        </div>
+      </div>
+
+      <!-- Options Accordion -->
+      <div class="advanced-options-toggle" id="toggle-options">
+        <div class="toggle-left">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>OCR Engine & Language Configuration</span>
+        </div>
+        <svg class="chevron-icon" id="chevron-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+
+      <div class="advanced-options-panel" id="options-panel">
+        <div class="options-grid">
+          <div class="option-field">
+            <label for="ocr-engine-select">OCR Engine</label>
+            <select id="ocr-engine-select">
+              <option value="tesseract" selected>Tesseract.js (Built-in &bull; 100% Free & Offline)</option>
+              <option value="gemini">Google Gemini AI Vision (Enhanced Markdown & Structure)</option>
+            </select>
+          </div>
+
+          <div class="option-field">
+            <label for="ocr-lang-select">OCR Primary Language</label>
+            <select id="ocr-lang-select">
+              <option value="eng" selected>English (eng)</option>
+              <option value="spa">Spanish (spa)</option>
+              <option value="fra">French (fra)</option>
+              <option value="deu">German (deu)</option>
+              <option value="por">Portuguese (por)</option>
+              <option value="hin">Hindi (hin)</option>
+              <option value="ita">Italian (ita)</option>
+              <option value="jpn">Japanese (jpn)</option>
+              <option value="chi_sim">Chinese Simplified (chi_sim)</option>
+            </select>
+          </div>
+
+          <div class="option-field full-width session-config-box">
+            <div class="session-box-header">
+              <div>
+                <label>Instagram Authentication (Bypasses 18+ and Login Limits)</label>
+                <p class="field-hint">Required for posts from accounts with age restrictions or custom limits.</p>
+              </div>
+              <span id="session-badge" class="tag tag-warn">Not Logged In</span>
+            </div>
+
+            <div class="session-box-actions">
+              <button type="button" id="btn-login-window" class="btn-secondary">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                  <polyline points="10 17 15 12 10 7"></polyline>
+                  <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+                Launch 1-Click Login Window
+              </button>
+              <span class="or-divider">OR</span>
+              <div class="cookie-input-wrap">
+                <input type="password" id="input-session-cookie" placeholder="Paste sessionid cookie...">
+                <button type="button" id="btn-save-cookie" class="btn-secondary btn-sm">Save Cookie</button>
+              </div>
+              <button type="button" id="btn-clear-session" class="btn-secondary btn-sm" style="display: none; color: #ef4444;">Disconnect</button>
+            </div>
+          </div>
+
+          <div class="option-field full-width" id="gemini-key-field" style="display: none;">
+            <label for="gemini-api-key">Gemini API Key (Optional for AI Vision)</label>
+            <input type="password" id="gemini-api-key" placeholder="AIzaSy...">
+            <span class="field-hint">Stored only in your browser's local session for private processing.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="action-footer">
+        <button id="btn-extract" class="btn-primary btn-glow">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span id="btn-extract-text">Extract All Carousel Text</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Age Restriction Alert Card -->
+    <section id="age-alert-card" class="card age-alert-card" style="display: none;">
+      <div class="alert-icon-wrap">
+        <span class="age-icon">18+</span>
+      </div>
+      <div class="alert-body">
+        <h3 class="alert-title">Age-Restricted Post Detected</h3>
+        <p class="alert-desc">
+          Instagram blocked guest access because this account has set age (18+) or audience limits. 
+          Connect your Instagram account once to automatically unlock and extract this post and any other 18+ content.
+        </p>
+        <div class="alert-actions">
+          <button id="btn-alert-login" class="btn-primary btn-sm btn-glow">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+              <polyline points="10 17 15 12 10 7"></polyline>
+              <line x1="15" y1="12" x2="3" y2="12"></line>
+            </svg>
+            Connect Account (1-Click Login)
+          </button>
+          <button id="btn-alert-cookie" class="btn-secondary btn-sm">Enter sessionid Cookie</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Progress Card -->
+    <section id="progress-card" class="card progress-card" style="display: none;">
+      <div class="progress-header">
+        <div class="progress-title-wrap">
+          <div class="spinner"></div>
+          <div>
+            <h3 id="progress-stage-title" class="progress-stage-title">Initializing Browser Engine</h3>
+            <p id="progress-message" class="progress-message">Connecting to Instagram and preparing carousel capture...</p>
+          </div>
+        </div>
+        <div class="progress-percentage" id="progress-percentage">15%</div>
+      </div>
+
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progress-bar-fill" style="width: 15%;"></div>
+      </div>
+
+      <div class="stepper-stages">
+        <div class="step-item active" id="step-1">
+          <div class="step-dot">1</div>
+          <span>Connect Post</span>
+        </div>
+        <div class="step-line" id="line-1"></div>
+        <div class="step-item" id="step-2">
+          <div class="step-dot">2</div>
+          <span>Capture Slides</span>
+        </div>
+        <div class="step-line" id="line-2"></div>
+        <div class="step-item" id="step-3">
+          <div class="step-dot">3</div>
+          <span>Run OCR</span>
+        </div>
+        <div class="step-line" id="line-3"></div>
+        <div class="step-item" id="step-4">
+          <div class="step-dot">4</div>
+          <span>Collate Text</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results-section" class="results-section" style="display: none;">
+      <!-- Post Meta Bar -->
+      <div class="card meta-card">
+        <div class="meta-content">
+          <div class="meta-author-wrap">
+            <div class="author-avatar" id="meta-avatar">IG</div>
+            <div class="author-details">
+              <div class="author-header">
+                <span class="author-name" id="meta-author">@instagram_user</span>
+                <a id="meta-link" href="#" target="_blank" class="author-link" rel="noopener">
+                  View on Instagram &nearr;
+                </a>
+              </div>
+              <p class="post-caption" id="meta-caption">Post caption text...</p>
+            </div>
+          </div>
+
+          <div class="meta-metrics">
+            <div class="metric-pill">
+              <span class="metric-val" id="metric-slides">0</span>
+              <span class="metric-lbl">Slides</span>
+            </div>
+            <div class="metric-pill">
+              <span class="metric-val" id="metric-words">0</span>
+              <span class="metric-lbl">Words</span>
+            </div>
+            <div class="metric-pill">
+              <span class="metric-val" id="metric-confidence">0%</span>
+              <span class="metric-lbl">Accuracy</span>
+            </div>
+            <div class="metric-pill">
+              <span class="metric-val" id="metric-time">1m</span>
+              <span class="metric-lbl">Read Time</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="results-toolbar">
+        <div class="toolbar-left">
+          <div class="view-switch">
+            <button class="view-btn active" id="view-split" data-view="split" title="Side-by-side Slide Viewer">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="12" y1="3" x2="12" y2="21"></line>
+              </svg>
+              Slide Viewer
+            </button>
+            <button class="view-btn" id="view-grid" data-view="grid" title="Multi-Slide Grid View">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              Grid View
+            </button>
+            <button class="view-btn" id="view-doc" data-view="doc" title="Unified Full Document">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              Full Text
+            </button>
+          </div>
+
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="search-input" placeholder="Search text in slides...">
+            <span id="search-count" class="search-count"></span>
+          </div>
+        </div>
+
+        <div class="toolbar-right">
+          <button id="btn-copy-all" class="btn-action" title="Copy all extracted text">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Copy All Text
+          </button>
+          <button id="btn-dl-md" class="btn-action" title="Download Markdown document">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Markdown (.md)
+          </button>
+          <button id="btn-dl-txt" class="btn-action" title="Download plain text file">
+            TXT
+          </button>
+          <button id="btn-dl-json" class="btn-action" title="Download JSON data">
+            JSON
+          </button>
+        </div>
+      </div>
+
+      <!-- View 1: Split Slide Viewer -->
+      <div id="container-split" class="view-container active">
+        <div class="card split-card">
+          <!-- Slide Preview Left -->
+          <div class="split-col slide-col">
+            <div class="slide-frame">
+              <img id="active-slide-img" src="" alt="Active Carousel Slide">
+              <button id="btn-prev-slide" class="slide-nav-btn prev-btn" title="Previous Slide">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              <button id="btn-next-slide" class="slide-nav-btn next-btn" title="Next Slide">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+              <div class="slide-badge" id="slide-badge">Slide 1 of 1</div>
+            </div>
+
+            <!-- Thumbnail Carousel Strip -->
+            <div class="thumb-strip-wrap">
+              <div class="thumb-strip" id="thumb-strip"></div>
+            </div>
+          </div>
+
+          <!-- Slide Text Right -->
+          <div class="split-col text-col">
+            <div class="text-col-header">
+              <div class="text-meta">
+                <h4 id="active-slide-title">Slide 1 Text</h4>
+                <div class="text-meta-tags">
+                  <span class="tag" id="active-slide-confidence">98% Accuracy</span>
+                  <span class="tag" id="active-slide-words">42 words</span>
+                </div>
+              </div>
+              <button id="btn-copy-slide" class="btn-secondary btn-sm">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy Slide
+              </button>
+            </div>
+
+            <div class="text-editor-wrap">
+              <textarea id="active-slide-text" class="slide-text-editor" spellcheck="false" placeholder="No text detected in this slide."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- View 2: Multi-Slide Grid View -->
+      <div id="container-grid" class="view-container">
+        <div class="slides-grid" id="slides-grid"></div>
+      </div>
+
+      <!-- View 3: Full Document View -->
+      <div id="container-doc" class="view-container">
+        <div class="card doc-card">
+          <div class="doc-header">
+            <h3>Full Assembled Carousel Text</h3>
+            <span class="tag" id="doc-word-count">0 words total</span>
+          </div>
+          <pre id="doc-full-text" class="doc-full-text"></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast"></div>
+
+  <footer class="app-footer">
+    <p>InstaExtract Studio &bull; Instagram Carousel Text Extraction & OCR Engine</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
